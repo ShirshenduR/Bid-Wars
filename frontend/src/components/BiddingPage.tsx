@@ -92,11 +92,11 @@ const BiddingPage: React.FC = () => {
             <p className="text-gray-300">Check back later for new startup ideas to bid on.</p>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
-              <div key={item.id} className="bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold text-white mb-2">
+              <div key={item.id} className="bg-gray-800 rounded-lg shadow-md overflow-hidden flex flex-col h-full">
+                <div className="p-6 flex-1 flex flex-col justify-between">
+                  <h3 className="text-lg font-semibold text-white mb-2 break-words">
                     {item.title}
                   </h3>
                   <p className="text-gray-300 mb-4 text-sm">

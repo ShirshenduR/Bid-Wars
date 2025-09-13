@@ -1,3 +1,8 @@
+import os
+from dotenv import load_dotenv
+import dj_database_url
+
+load_dotenv()
 """
 Django settings for bidwars project.
 
@@ -26,7 +31,7 @@ SECRET_KEY = 'django-insecure-!qh1e(b0z4+5x0^xi(qc(q#4)c7r1ay3m*8s9daj^vnmnf1l@q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -79,12 +84,18 @@ WSGI_APPLICATION = 'bidwars.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+db_url = os.environ.get('DATABASE_URL')
+if db_url:
+    DATABASES = {
+        'default': dj_database_url.parse(db_url)
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -147,8 +158,9 @@ SIMPLE_JWT = {
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    os.environ.get('FRONTEND_URL', 'http://localhost:3000'),
 ]
 
 CORS_ALLOW_CREDENTIALS = True

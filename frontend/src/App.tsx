@@ -9,6 +9,7 @@ import CreateItem from './components/CreateItem';
 import BiddingPage from './components/BiddingPage';
 import ItemDetails from './components/ItemDetails';
 import ProtectedRoute from './components/ProtectedRoute';
+import Footer from './components/Footer';
 
 const AppContent: React.FC = () => {
   const { user } = useAuth();
@@ -51,6 +52,7 @@ const AppContent: React.FC = () => {
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Footer />
     </div>
   );
 };

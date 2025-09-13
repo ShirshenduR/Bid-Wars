@@ -53,56 +53,54 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-black py-6 sm:px-6 lg:px-8">
-      <div className="px-4 py-6 sm:px-0">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-black py-4 px-2 sm:px-4 lg:px-8 flex flex-col items-center w-full overflow-x-hidden">
+      <div className="w-full max-w-3xl">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white text-center sm:text-left">Admin Dashboard</h1>
           <Link
             to="/admin/create-item"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium w-full sm:w-auto text-center"
           >
             Create Startup Idea
           </Link>
         </div>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-center">
             {error}
           </div>
         )}
 
-        <div className="bg-gray-800 shadow overflow-hidden sm:rounded-md">
+        <div className="bg-gray-800 shadow overflow-hidden rounded-md">
           <ul className="divide-y divide-gray-700">
             {items.length === 0 ? (
-              <li className="px-6 py-4 text-center text-gray-300">
+              <li className="px-4 py-6 text-center text-gray-300">
                 No startup ideas found. Create your first startup idea to get started.
               </li>
             ) : (
               items.map((item) => (
-                <li key={item.id} className="px-6 py-4">
-                  <div className="flex items-center justify-between">
+                <li key={item.id} className="px-4 py-6">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-medium text-white">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                        <h3 className="text-lg font-medium text-white break-words">
                           {item.title}
                         </h3>
-                        <div className="flex items-center space-x-2">
-                          <span
-                            className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                              item.is_active
-                                ? 'bg-green-900 text-green-200'
-                                : 'bg-red-900 text-red-200'
-                            }`}
-                          >
-                            {item.is_active ? 'Active' : 'Inactive'}
-                          </span>
-                        </div>
+                        <span
+                          className={`px-2 py-1 text-xs font-semibold rounded-full self-start sm:self-auto ${
+                            item.is_active
+                              ? 'bg-green-900 text-green-200'
+                              : 'bg-red-900 text-red-200'
+                          }`}
+                        >
+                          {item.is_active ? 'Active' : 'Inactive'}
+                        </span>
                       </div>
-                      <p className="text-gray-300 mt-1">{item.description}</p>
-                      <div className="mt-2 flex items-center space-x-4 text-sm text-gray-400">
-                        <span>Starting Price: ${item.starting_price}</span>
-                        <span>Max Amount: ${item.max_amount}</span>
-                        <span>Current Highest: ${item.current_highest_bid}</span>
+                      <p className="text-gray-300 mt-2 mb-2 break-words">{item.description}</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm text-gray-400 mb-2">
+                        <span>Starting Price: ₹{item.starting_price}</span>
+                        <span>Max Amount: ₹{item.max_amount}</span>
+                        <span>Current Highest: ₹{item.current_highest_bid}</span>
                         <span>Bids: {item.bid_count}</span>
                         {item.current_highest_bidder && (
                           <span>Top Bidder: {item.current_highest_bidder}</span>
@@ -112,16 +110,16 @@ const AdminDashboard: React.FC = () => {
                         Created: {new Date(item.created_at).toLocaleDateString()}
                       </div>
                     </div>
-                    <div className="ml-4 flex space-x-2">
+                    <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                       <Link
                         to={`/items/${item.id}`}
-                        className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-1 rounded text-sm"
+                        className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-2 rounded text-sm text-center w-full sm:w-auto"
                       >
                         View Details
                       </Link>
                       <button
                         onClick={() => handleToggleStatus(item.id)}
-                        className={`px-3 py-1 rounded text-sm text-white ${
+                        className={`px-3 py-2 rounded text-sm text-white w-full sm:w-auto ${
                           item.is_active
                             ? 'bg-red-700 hover:bg-red-800'
                             : 'bg-green-700 hover:bg-green-800'
