@@ -68,6 +68,7 @@ export interface Item {
   title: string;
   description: string;
   starting_price: string;
+  max_amount?: string;
   created_at: string;
   is_active: boolean;
   created_by: string;

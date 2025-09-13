@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../AuthContext';
-import { Item, itemsAPI, bidsAPI } from '../api';
+import { Item as StartupIdea, itemsAPI, bidsAPI } from '../api';
 import { Link } from 'react-router-dom';
 
 const BiddingPage: React.FC = () => {
   const { user } = useAuth();
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<StartupIdea[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [bidAmount, setBidAmount] = useState<{ [key: number]: string }>({});
@@ -64,96 +64,95 @@ const BiddingPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="text-center">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-black flex items-center justify-center">
+        <div className="text-center text-white">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div className="px-4 py-6 sm:px-0">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-black flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Active Auctions</h1>
-          <div className="text-sm text-gray-500">
+          <h1 className="text-3xl font-bold text-white">Active Startup Ideas</h1>
+          <div className="text-sm text-gray-300">
             Updates every 3 seconds
           </div>
         </div>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded mb-4">
             {error}
           </div>
         )}
 
         {items.length === 0 ? (
           <div className="text-center py-12">
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No active auctions</h3>
-            <p className="text-gray-500">Check back later for new items to bid on.</p>
+            <h3 className="text-lg font-medium text-white mb-2">No active startup ideas</h3>
+            <p className="text-gray-300">Check back later for new startup ideas to bid on.</p>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
-              <div key={item.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div key={item.id} className="bg-gray-800 rounded-lg shadow-md overflow-hidden">
                 <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="text-lg font-semibold text-white mb-2">
                     {item.title}
                   </h3>
-                  <p className="text-gray-600 mb-4 text-sm">
+                  <p className="text-gray-300 mb-4 text-sm">
                     {item.description}
                   </p>
-                  
                   <div className="space-y-2 mb-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Starting Price:</span>
-                      <span className="font-medium">${item.starting_price}</span>
+                      <span className="text-gray-400">Starting Price:</span>
+                      <span className="font-medium text-white">₹{item.starting_price}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Current Highest:</span>
-                      <span className="font-bold text-green-600">
-                        ${item.current_highest_bid}
-                      </span>
+                      <span className="text-gray-400">Max Amount:</span>
+                      <span className="font-medium text-white">₹{item.max_amount}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Top Bidder:</span>
-                      <span className="font-medium">
+                      <span className="text-gray-400">Current Highest:</span>
+                      <span className="font-bold text-green-400">₹{item.current_highest_bid}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-400">Top Bidder:</span>
+                      <span className="font-medium text-white">
                         {item.current_highest_bidder || 'None'}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">Total Bids:</span>
-                      <span>{item.bid_count}</span>
+                      <span className="text-gray-400">Total Bids:</span>
+                      <span className="text-white">{item.bid_count}</span>
                     </div>
                   </div>
-
                   <form onSubmit={(e) => handleBidSubmit(item.id, e)} className="space-y-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Your Bid Amount ($)
+                      <label className="block text-sm font-medium text-gray-200 mb-1">
+                        Your Bid Amount (₹)
                       </label>
                       <input
                         type="number"
                         min={parseFloat(item.current_highest_bid) + 0.01}
+                        max={item.max_amount ? parseFloat(item.max_amount) : undefined}
                         step="0.01"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                        placeholder={`Minimum: $${(parseFloat(item.current_highest_bid) + 0.01).toFixed(2)}`}
+                        className="w-full px-3 py-2 border border-gray-700 bg-gray-900 text-white rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                        placeholder={`Min: ₹${(parseFloat(item.current_highest_bid) + 0.01).toFixed(2)}${item.max_amount ? ", Max: ₹" + item.max_amount : ''}`}
                         value={bidAmount[item.id] || ''}
                         onChange={(e) => setBidAmount(prev => ({ ...prev, [item.id]: e.target.value }))}
                       />
                     </div>
-                    
                     <div className="flex space-x-2">
                       <button
                         type="submit"
                         disabled={bidding[item.id] || !bidAmount[item.id]}
-                        className="flex-1 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white py-2 px-4 rounded-md text-sm font-medium"
+                        className="flex-1 bg-indigo-700 hover:bg-indigo-800 disabled:bg-gray-700 text-white py-2 px-4 rounded-md text-sm font-medium"
                       >
                         {bidding[item.id] ? 'Placing Bid...' : 'Place Bid'}
                       </button>
-                      
                       <Link
                         to={`/items/${item.id}`}
-                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-md text-sm font-medium text-center"
+                        className="bg-gray-700 hover:bg-gray-800 text-gray-200 py-2 px-4 rounded-md text-sm font-medium text-center"
                       >
                         Details
                       </Link>

@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
 
 
 class User(AbstractUser):
@@ -22,6 +23,7 @@ class Item(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(0.01)]
     )
+    max_amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)], null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_items')
@@ -60,18 +62,20 @@ class Bid(models.Model):
         unique_together = ['item', 'user', 'bid_amount']  # Prevent duplicate bids
 
     def __str__(self):
-        return f"{self.user.username} bid ${self.bid_amount} on {self.item.title}"
+        return f"{self.user.username} bid ₹{self.bid_amount} on {self.item.title}"
 
     def clean(self):
-        """Validate that bid is higher than current highest bid"""
-        from django.core.exceptions import ValidationError
-        
+        """Validate that bid is within valid range"""
         if not self.item.is_active:
             raise ValidationError("Cannot bid on inactive items")
         
         current_highest = self.item.current_highest_bid
+        max_amt = self.item.max_amount if self.item.max_amount else None
+        
         if self.bid_amount <= current_highest:
-            raise ValidationError(f"Bid must be higher than current highest bid of ${current_highest}")
+            raise ValidationError(f"Bid must be higher than current highest bid of ₹{current_highest}")
+        if max_amt and self.bid_amount > max_amt:
+            raise ValidationError(f"Bid cannot exceed max amount ₹{max_amt}")
 
     def save(self, *args, **kwargs):
         self.full_clean()

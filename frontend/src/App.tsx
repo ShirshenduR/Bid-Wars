@@ -14,7 +14,7 @@ const AppContent: React.FC = () => {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-900 to-black">
       <Navigation />
       <Routes>
         <Route 

@@ -14,11 +14,21 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if attrs['password'] != attrs['password_confirm']:
             raise serializers.ValidationError("Passwords don't match")
+        # Only allow admins to create admin users
+        request = self.context.get('request')
+        if attrs['role'] == 'admin':
+            if not request or not request.user.is_authenticated or request.user.role != 'admin':
+                raise serializers.ValidationError("Only admins can create admin users")
         return attrs
 
     def create(self, validated_data):
         validated_data.pop('password_confirm')
         password = validated_data.pop('password')
+        # Force role to 'player' if not admin creating
+        request = self.context.get('request')
+        if validated_data.get('role') == 'admin':
+            if not request or not request.user.is_authenticated or request.user.role != 'admin':
+                validated_data['role'] = 'player'
         user = User.objects.create_user(**validated_data)
         user.set_password(password)
         user.save()
@@ -56,10 +66,11 @@ class ItemSerializer(serializers.ModelSerializer):
     current_highest_bidder = serializers.SerializerMethodField()
     created_by = serializers.StringRelatedField(read_only=True)
     bid_count = serializers.SerializerMethodField()
+    max_amount = serializers.DecimalField(max_digits=10, decimal_places=2, required=False)
 
     class Meta:
         model = Item
-        fields = ('id', 'title', 'description', 'starting_price', 'created_at', 
+        fields = ('id', 'title', 'description', 'starting_price', 'max_amount', 'created_at', 
                  'is_active', 'created_by', 'current_highest_bid', 
                  'current_highest_bidder', 'bid_count')
         read_only_fields = ('created_at', 'created_by')
@@ -90,9 +101,14 @@ class BidSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError("Cannot bid on inactive items")
                 
                 current_highest = item_obj.current_highest_bid
+                max_amt = item_obj.max_amount if item_obj.max_amount else None
                 if value <= current_highest:
                     raise serializers.ValidationError(
-                        f"Bid must be higher than current highest bid of ${current_highest}"
+                        f"Bid must be higher than current highest bid of ₹{current_highest}"
+                    )
+                if max_amt and value > max_amt:
+                    raise serializers.ValidationError(
+                        f"Bid cannot exceed max amount ₹{max_amt}"
                     )
             except Item.DoesNotExist:
                 raise serializers.ValidationError("Invalid item")
